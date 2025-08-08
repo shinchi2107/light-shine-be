@@ -3,7 +3,6 @@ const { middleware } = require('@iKernel');
 const apiRouter = require('../../routes');
 
 const router = Router();
-
 router.use(middleware.api, apiRouter);
 
 router.use('/404', (req, res) => {

@@ -1,10 +1,9 @@
-const { FilterXSS } = require("xss");
+const xss = require("xss");
 
 const sanitize = (obj, options = {}) => {
-    const xssFilter = new FilterXSS(options);
-    for (const key in obj) {
+    for (let key in obj) {
         if (typeof obj[key] === 'string') {
-            obj[key] = xssFilter.process(obj[key]);
+            obj[key] = xss(obj[key], options);
         } else if (typeof obj[key] === 'object' && obj[key] !== null) {
             sanitize(obj[key], options);
         }
