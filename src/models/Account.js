@@ -5,7 +5,7 @@ const accountSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     avatar: { type: String, default: null },
-    role: { type: String, enum: ["owner", "employee"], default: "employee" },
+    role: { type: String, enum: ["owner", "employee", "user"], default: "user" },
     status: { type: String, enum: ["active", "inactive"], default: "active" },
 }, { timestamps: true });
 

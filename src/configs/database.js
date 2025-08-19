@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { log } = require("@utils/logger/log");
 const  { DB_HOST, DB_NAME } = process.env;
 
 async function connectDB() {
@@ -6,9 +7,9 @@ async function connectDB() {
         const db = await mongoose.connect(DB_HOST, {
             dbName: DB_NAME,
         });
-        console.log(`Connected successfully to database: ${db.connection.name}`);
+        log(`Connected successfully to database: ${db.connection.name}`);
     } catch (error) {
-        console.log(error)
+        log(`Error connecting to database: ${JSON.stringify(error)}`);
         throw new Error(`Error connecting to database: ${JSON.stringify(error)}`);
     }
 }
