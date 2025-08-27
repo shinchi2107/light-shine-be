@@ -35,13 +35,14 @@ const logoutAccount = async (token) => {
     return { message: "Logged out successfully" };
 }
 
-const refreshTokenAccount = async ({ token }) => {
+const refreshTokenAccount = async (token) => {
     const payload = verifyRefreshToken(token);
-    const stored = await RefreshToken.findOne({ token });
+    console.log(token);
+    const stored = await RefreshToken.findOneAndDelete({ token });
     if (!stored) throw new Error("Invalid token");
 
     const account = await Account.findById(payload.id);
-    const { accessToken, refreshToken } = generateTokens(account);
+    const { accessToken, refreshToken } = generateTokens(account, "60m", payload.exp - payload.iat);
 
     await RefreshToken.create({ token: refreshToken, account_id: account._id });
 
