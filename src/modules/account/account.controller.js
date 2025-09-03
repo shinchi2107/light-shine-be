@@ -1,4 +1,4 @@
-const { getAccount, updateAccount } = require("./account.service");
+const { getAccount, updateAccount, getAllAccounts, createAccountService } = require("./account.service");
 const { HTTPStatusCode } = require("@constants");
 const bcrypt = require("bcryptjs");
 const { log } = require("@utils/logger/log");
@@ -66,8 +66,32 @@ const updateAccountPassword = async (req, res) => {
     }
 }
 
+const getAccounts = async (req, res) => {
+    try {
+        const { page = 1, limit = 10, search = "" } = req.query;
+        const accounts = await getAllAccounts({ page: parseInt(page), limit: parseInt(limit), search });
+        res.status(HTTPStatusCode.Ok).sendData({ ...accounts });
+    } catch (error) {
+        log(error);
+        res.status(HTTPStatusCode.BadRequest).sendData({ message: error.message });
+    }
+}
+
+const createAccount = async (req, res) => {
+    try {
+        const data = req.body;
+        await createAccountService(data);
+        res.status(HTTPStatusCode.Created).sendData({ message: "Account created successfully" });
+    } catch (error) {
+        log(error);
+        res.status(HTTPStatusCode.BadRequest).sendData({ message: error.message });
+    }
+}
+
 module.exports = {
     getProfileMe,
     updateAccountProfile,
-    updateAccountPassword
+    updateAccountPassword,
+    getAccounts,
+    createAccount
 }
