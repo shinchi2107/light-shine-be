@@ -1,9 +1,9 @@
 const Account = require("@models/Account");
 const bcrypt = require("bcryptjs");
 
-const getAccount = async (email, exclude = "") => {
+const findAccount = async (query, exclude = "") => {
     const account = await Account.findOne({
-        email
+        ...query
     }).select("-__v " + exclude).lean();
     if (!account) {
         throw new Error("Account not found");
@@ -11,8 +11,8 @@ const getAccount = async (email, exclude = "") => {
     return account;
 }
 
-const updateAccount = async (email, data) => {
-    const account = await Account.findOneAndUpdate({ email }, data, { new: true }).select("-password -__v").lean();
+const updateAccount = async (search, data) => {
+    const account = await Account.findOneAndUpdate(search, data, { new: true }).select("-password -__v").lean();
     if (!account) {
         throw new Error("Account not found");
     }
@@ -32,7 +32,7 @@ const getAllAccounts = async ({ page = 1, limit = 10, search = "" }) => {
     }
 
     const [accounts, total] = await Promise.all([
-        Account.find(query).select("-password -__v").skip(skip).limit(limit),
+        Account.find(query).select("-password -__v").sort({ createdAt: -1 }).skip(skip).limit(limit),
         Account.countDocuments(query)
     ]).catch(err => {
         throw new Error(err);
@@ -63,7 +63,7 @@ const createAccountService = async ({ name, email, password, avatar }) => {
 
 
 module.exports = {
-    getAccount,
+    findAccount,
     getAllAccounts,
     updateAccount,
     createAccountService
