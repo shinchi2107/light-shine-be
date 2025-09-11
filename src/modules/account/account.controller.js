@@ -29,6 +29,26 @@ const findAccountById = async (req, res) => {
     }
 }
 
+const updateAccountById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { isChangePassword, password, ...data } = req.body;
+        const dataUpdate = { ...data };
+        if(isChangePassword){
+            const hashedPassword = await bcrypt.hash(password, 10);
+            dataUpdate.password = hashedPassword;
+        }
+        const account = await updateAccount({ _id: id }, dataUpdate);
+        if(!account){
+            return res.status(HTTPStatusCode.BadRequest).sendData({ message: "Account not found" });
+        }
+        res.status(HTTPStatusCode.Ok).sendData({ message: "Updated successfully" });
+    } catch (error) {
+        log(error);
+        res.status(HTTPStatusCode.BadRequest).sendData({ message: error.message });
+    }
+}
+
 const updateAccountProfile = async (req, res) => {
     try {
         const { email } = req.account;
@@ -92,7 +112,10 @@ const getAccounts = async (req, res) => {
 const createAccount = async (req, res) => {
     try {
         const data = req.body;
-        await createAccountService(data);
+        const account = await createAccountService(data);
+        if (!account) {
+            return res.status(HTTPStatusCode.BadRequest).sendData({ message: "Account not created" });
+        }
         res.status(HTTPStatusCode.Created).sendData({ message: "Account created successfully" });
     } catch (error) {
         log(error);
@@ -106,5 +129,6 @@ module.exports = {
     updateAccountProfile,
     updateAccountPassword,
     getAccounts,
-    createAccount
+    createAccount,
+    updateAccountById
 }
